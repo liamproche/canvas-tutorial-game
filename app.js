@@ -23,6 +23,7 @@ window.addEventListener('load', function(){
         draw(context){
             context.beginPath()
             context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+            //save and restore around alpha appplies only to one object
             context.save()
             context.globalAlpha = 0.5
             context.fill()
@@ -47,13 +48,21 @@ window.addEventListener('load', function(){
             }
             this.collisionX += this.speedX * this.speedModifier
             this.collisionY += this.speedY * this.speedModifier
+            //check collision with obstacles
+            this.game.obstacles.forEach(obstacle => {
+                if(this.game.checkCollision(this, obstacle)){
+                    console.log("collision")
+                }
+            })
         }
     }
 
     class Obstacle{
         constructor(game){
             this.game = game
+            //randomly positions obstacles along X-axis
             this.collisionX = Math.random() * this.game.width
+            //randomly positions obstacles along Y-axis
             this.collisionY = Math.random() * this.game.height
             this.collisionRadius = 60
             this.image = document.getElementById('obstacles')
@@ -63,10 +72,13 @@ window.addEventListener('load', function(){
             this.height = this.spriteHeight
             this.spriteX = this.collisionX - this.width * 0.5
             this.spriteY = this.collisionY - this.height * 0.5 - 50
+            //sets which selected image along columns of spritesheet to random
             this.frameX = Math.floor(Math.random() * 4)
+            //sets which selected image along rows of spritesheet to random
             this.frameY = Math.floor(Math.random() * 3)
         }
         draw(context){
+            //draws images from spritesheet using above variables
             context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
             context.beginPath()
             context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
@@ -83,6 +95,7 @@ window.addEventListener('load', function(){
             this.canvas = canvas
             this.width = this.canvas.width
             this.height = this.canvas.height
+            //draws objects on the Y-axis below background 
             this.topMargin = 260
             this.player = new Player(this)
             this.numberOfObstacles = 10
@@ -116,15 +129,27 @@ window.addEventListener('load', function(){
             this.player.update()
             this.obstacles.forEach(obstacle => obstacle.draw(context))
         }
+        
+        checkCollision(a, b){
+            const dx = a.collisionX - b.collisionX
+            const dy = a.collisionY - b.collisionY
+            const distance = Math.hypot(dy, dx)
+            const sumOfRadii = a.collisionRadius + b.collisionRadius
+            return (distance < sumOfRadii)
+        }
+        
         init(){
             let attempts = 0
+            //while loop to populate obstacle array (hardcoded 500 max as fail-safe)
             while(this.obstacles.length < this.numberOfObstacles && attempts < 500){
                 let testObstacle = new Obstacle(this)
                 let overlap = false
+                //forEach to check for object collision
                 this.obstacles.forEach(obstacle =>{
                     const dx = testObstacle.collisionX - obstacle.collisionX
                     const dy = testObstacle.collisionY - obstacle.collisionY
                     const distance = Math.hypot(dy,dx)
+                    //variable to create buffer around obstacles
                     const distanceBuffer = 150
                     const sumOfRadii = testObstacle.collisionRadius + obstacle.collisionRadius + distanceBuffer
                     if (distance < sumOfRadii){
@@ -132,6 +157,7 @@ window.addEventListener('load', function(){
                     }
                 })
                 const margin = testObstacle.collisionRadius * 2
+                //actually pushes non-collided obstacles into obstacle array
                 if(!overlap && testObstacle.spriteX > 0 && testObstacle.spriteX < this.width - testObstacle.width && testObstacle.collisionY > this.topMargin + margin && testObstacle.collisionY < this.height - margin){
                     this.obstacles.push(testObstacle)
                 }
