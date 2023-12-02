@@ -11,6 +11,7 @@ window.addEventListener('load', function(){
     class Player{
         constructor(game){
             this.game = game
+            //calculates where we drop image into window
             this.collisionX = this.game.width * 0.5;
             this.collisionY = this.game.height * 0.5;
             this.collisionRadius = 30
@@ -19,8 +20,18 @@ window.addEventListener('load', function(){
             this.dx = 0
             this.dy = 0
             this.speedModifier = 5
+            this.spriteWidth = 255
+            this.spriteHeight = 255
+            this.width = this.spriteWidth
+            this.height = this.spriteHeight
+            //calculates spritesheet frame image
+            this.spriteX
+            this.spriteY
+            this.image = document.getElementById('bull')
         }
         draw(context){
+            //draws player from spritesheet... params defined above
+            context.drawImage(this.image, 0, 0, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
             context.beginPath()
             context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
             //save and restore around alpha appplies only to one object
@@ -48,6 +59,9 @@ window.addEventListener('load', function(){
             }
             this.collisionX += this.speedX * this.speedModifier
             this.collisionY += this.speedY * this.speedModifier
+            this.spriteX = this.collisionX - this.width * 0.5
+            this.spriteY = this.collisionY - this.height * 0.5 - 100
+
             //check collision with obstacles
             this.game.obstacles.forEach(obstacle => {
                 //[(distance < sumOfRadii), distance, sumOfRadii, dx, dy]
