@@ -50,8 +50,17 @@ window.addEventListener('load', function(){
             this.collisionY += this.speedY * this.speedModifier
             //check collision with obstacles
             this.game.obstacles.forEach(obstacle => {
-                if(this.game.checkCollision(this, obstacle)){
-                    console.log("collision")
+                //[(distance < sumOfRadii), distance, sumOfRadii, dx, dy]
+                //Note- destructured syntax allows values to be unpacked from arrays at index position without having to unpack separate variables
+                let [collision, distance, sumOfRadii, dx, dy] = this.game.checkCollision(this, obstacle)
+                // let collision1 = game.checkCollision(this, obstacle)[0]
+                // let distance1 = game.checkCollision(this, obstacle)[1]
+                if(collision){
+                    const unit_x = dx / distance
+                    const unit_y = dy / distance
+                    //this is the math that pushes a player back when they collide
+                    this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x
+                    this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y
                 }
             })
         }
@@ -125,9 +134,10 @@ window.addEventListener('load', function(){
             })
         }
         render(context){
+            this.obstacles.forEach(obstacle => obstacle.draw(context))
             this.player.draw(context)
             this.player.update()
-            this.obstacles.forEach(obstacle => obstacle.draw(context))
+
         }
         
         checkCollision(a, b){
@@ -135,7 +145,8 @@ window.addEventListener('load', function(){
             const dy = a.collisionY - b.collisionY
             const distance = Math.hypot(dy, dx)
             const sumOfRadii = a.collisionRadius + b.collisionRadius
-            return (distance < sumOfRadii)
+            //returns boolean first to check collision, then returns other values for player physics ORDER IMPORTANT!!!
+            return [(distance < sumOfRadii), distance, sumOfRadii, dx, dy]
         }
         
         init(){
