@@ -138,6 +138,9 @@ window.addEventListener('load', function(){
                 context.restore()
                 context.stroke()
         }}
+        update(){
+
+        }
     }   
 
     class Egg {
@@ -197,11 +200,12 @@ window.addEventListener('load', function(){
             this.timer = 0
             this.interval = 1000/this.fps
             this.eggTimer = 0
-            this.eggInterval = 500
+            this.eggInterval = 1000
             this.numberOfObstacles = 10
             this.obstacles = []
             this.eggs = []
-            this.maxEggs = 10
+            this.maxEggs = 20
+            this.gameObjects = []
             this.mouse = {
                 x: this.width * 0.5,
                 y: this.height * 0.5,
@@ -233,15 +237,18 @@ window.addEventListener('load', function(){
             if(this.timer > this.interval){
                 //animate the next frame
                 context.clearRect(0, 0, this.width, this.height)
-                this.timer = 0
-                this.obstacles.forEach(obstacle => obstacle.draw(context))
-                this.eggs.forEach(egg => {
-                    egg.draw(context)
-                    egg.update()
+                this.gameObjects = [...this.eggs, ...this.obstacles, this.player]
+                //sort objects by vertical position
+                this.gameObjects.sort((a, b)=>{
+                    return a.collisionY - b.collisionY
+                })
+                this.gameObjects.forEach(object => {
+                    object.draw(context)
+                    object.update()
                 })
 
-                this.player.draw(context)
-                this.player.update()
+                
+                this.timer = 0
             }
             this.timer += deltaTime
 
@@ -249,7 +256,6 @@ window.addEventListener('load', function(){
             if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs){
                 this.addEgg()
                 this.eggTimer = 0
-                console.log(this.eggs)
             } else{
                 this.eggTimer += deltaTime
             }
