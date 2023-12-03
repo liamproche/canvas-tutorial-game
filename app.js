@@ -7,7 +7,7 @@ window.addEventListener('load', function(){
     ctx.fillStyle = 'white';
     ctx.lineWidth = 3;
     ctx.strokeStyle = 'black';
-    ctx.font = '40px Helvetica'
+    ctx.font = '40px Bangers'
     ctx.textAlign = 'center'
     
     class Player{
@@ -238,7 +238,7 @@ window.addEventListener('load', function(){
             if (this.collisionY < this.game.topMargin){
                 this.markedForDeletion = true
                 this.game.removeGameObjects()
-                this.game.score++
+                if(!this.game.gameOver)this.game.score++
                 for (let i= 0; i < 10; i++){
                     this.game.particles.push(new Firefly(this.game, this.collisionX, this.collisionY, 'green'))
                 }
@@ -267,7 +267,6 @@ window.addEventListener('load', function(){
             })
         }
     }
-
     class Enemy{
         constructor(game){
             this.game = game
@@ -303,7 +302,7 @@ window.addEventListener('load', function(){
             this.spriteX = this.collisionX - this.width * 0.5
             this.spriteY = this.collisionY - this.height * 0.5 - 95
             this.collisionX -= this.speedX
-            if(this.spriteX + this.width < 0){
+            if(this.spriteX + this.width < 0 && !this.game.gameOver){
                 this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
                 this.collisionY = this.game.topMargin + (Math.random() * (this.game.height - this.game.topMargin))
                 this.frameY = Math.floor(Math.random() * 4)
@@ -321,7 +320,6 @@ window.addEventListener('load', function(){
             })
         }
     }
-    
     class Particle{
         constructor(game, x, y, color){
             this.game = game
@@ -345,7 +343,6 @@ window.addEventListener('load', function(){
             context.restore()
         }
     }
-
     class Firefly extends Particle{
         update(){
             this.angle += this.va
@@ -357,7 +354,6 @@ window.addEventListener('load', function(){
             }
         }
     }
-
     class Spark extends Particle{
         update(){
             this.angle += this.va * 0.5
@@ -371,7 +367,6 @@ window.addEventListener('load', function(){
             }
         }
     }
-
     class Game{
         constructor(canvas){
             this.canvas = canvas
@@ -395,6 +390,8 @@ window.addEventListener('load', function(){
             this.maxEggs = 10
             this.gameObjects = []
             this.score = 0
+            this.winningScore = 5
+            this.gameOver = false
             this.lostHatchlings = 0
             this.mouse = {
                 x: this.width * 0.5,
@@ -443,7 +440,7 @@ window.addEventListener('load', function(){
             this.timer += deltaTime
 
             //add eggs periodically (uses delta time)
-            if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs){
+            if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs && !this.gameOver){
                 this.addEgg()
                 this.eggTimer = 0
             } else{
@@ -457,6 +454,37 @@ window.addEventListener('load', function(){
                 context.fillText('Lost: ' + this.lostHatchlings, 25, 100)
             }
             context.restore()
+
+            //win / lose message
+            if(this.score >= this.winningScore){
+                this.gameOver = true
+                context.save()
+                context.fillStyle = 'rgba(0, 0 , 0, .5)'
+                context.fillRect(0, 0, this.width, this.height)
+                context.fillStyle = 'white'
+                context.textAlign = 'center'
+                context.shadowOffsetX = 4
+                context.shadowOOffsetY = 4
+                context.shadowColor = 'black'
+                let message1
+                let message2
+                context.font = '130px, Bangers'
+                //this sets number of lost hatchlings
+                if (this.lostHatchlings <= 7){
+                    //win 
+                    message1 = "You win!!!"
+                    message2 = "Hail yourself! & Hail Satan!"
+                }else{
+                    message1 = "You suck!!!"
+                    message2 = "You lost " + this.lostHatchlings + "hatchlings. Satan is pissed."
+                }
+                
+                context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20)
+                context.font = '40px, Bangers'
+                context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30)
+                context.fillText("Final score" + this.score `. Press 'R' to respawn.`, this.width * 0.5, this.height * 0.5 + 80)
+                context.restore()
+            }
         }
         checkCollision(a, b){
             const dx = a.collisionX - b.collisionX
