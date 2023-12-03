@@ -275,7 +275,7 @@ window.addEventListener('load', function(){
             this.collisionX = this.game.width
             this.collisionY = this.game.topMargin + (Math.random() * (this.game.height - this.game.topMargin))
             this.speedX = Math.random() * 3 + 5
-            this.image = document.getElementById('toad')
+            this.image = document.getElementById('toads')
             this.spriteWidth = 140
             this.spriteHeight = 260
             this.width = this.spriteWidth
@@ -284,9 +284,11 @@ window.addEventListener('load', function(){
             this.collisionY = Math.random() * this.game.height
             this.spriteX
             this.spriteY
+            this.frameX = 0
+            this.frameY = Math.floor(Math.random() * 4)
         }
         draw(context){
-            context.drawImage(this.image, this.spriteX, this.spriteY)
+            context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
             if(this.game.debug){
                 context.beginPath()
                 context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
@@ -304,6 +306,7 @@ window.addEventListener('load', function(){
             if(this.spriteX + this.width < 0){
                 this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
                 this.collisionY = this.game.topMargin + (Math.random() * (this.game.height - this.game.topMargin))
+                this.frameY = Math.floor(Math.random() * 4)
             }
             let collisionObjects = [this.game.player, ...this.game.obstacles]
             collisionObjects.forEach(object =>{
@@ -389,7 +392,7 @@ window.addEventListener('load', function(){
             this.enemies = []
             this.hatchlings = []
             this.particles = []
-            this.maxEggs = 20
+            this.maxEggs = 10
             this.gameObjects = []
             this.score = 0
             this.lostHatchlings = 0
@@ -475,7 +478,7 @@ window.addEventListener('load', function(){
             this.particles = this.particles.filter(object => !object.markedForDeletion)
         }
         init(){
-            for (let i = 0; i < 3; i++){
+            for (let i = 0; i < 5; i++){
                 this.addEnemy()
             }
             let attempts = 0
