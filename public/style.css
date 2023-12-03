@@ -15,6 +15,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-#obstacles, #bull, #egg{
+#obstacles, #bull, #egg, #toad{
     display: none;
 }
