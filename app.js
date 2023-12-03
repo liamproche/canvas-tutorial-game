@@ -187,6 +187,32 @@ window.addEventListener('load', function(){
         }
     }
 
+    class Larva{
+        //pass larva x & y coordinates of egg
+        constructor(game, x, y){
+            this.game = game
+            this.collisionX = x
+            this.collisionY = y
+            this.collisionRadius = 30
+            this.image = document.getElementById('larva')
+            this.spriteWidth = 150
+            this.spritHeight = 150
+            this.width = this.spriteWidth
+            this.height = this.spritHeight
+            this.spriteX
+            this.spriteY
+            this.speedY = 1 + Math.random()
+        }
+        draw(context){
+            context.drawImage(this.image, this.spriteX, this.spriteY)
+        }
+        update(){
+            this.collisionY -= this.speedY
+            this.spriteX = this.collisionX - this.width * 0.5
+            this.spriteY = this.collisionY - this.height * 0.5
+        }
+    }
+
     class Enemy{
         constructor(game){
             this.game = game
@@ -245,7 +271,7 @@ window.addEventListener('load', function(){
             this.height = this.canvas.height
             //draws objects on the Y-axis below background 
             this.topMargin = 260
-            this.debug = true
+            this.debug = false
             this.player = new Player(this)
             this.fps = 70
             this.timer = 0
