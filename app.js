@@ -240,7 +240,6 @@ window.addEventListener('load', function(){
             if (this.collisionY < this.game.topMargin){
                 this.markedForDeletion = true
                 this.game.removeGameObjects()
-                this.game.score++
             }
             //collisions with objects
             let collisionObjects = [this.game.player, ...this.game.obstacles]
@@ -254,13 +253,6 @@ window.addEventListener('load', function(){
                 }
             })
             //collision with enemies
-            this.game.enemies.forEach(enemy => {
-                if(this.game.checkCollision(this, enemy[0])){
-                    this.markedForDeletion = true
-                    this.game.removeGameObjects
-                    this.game.lostHatchlings++
-                }
-            })
         }
     }
 
@@ -336,8 +328,6 @@ window.addEventListener('load', function(){
             this.hatchlings = []
             this.maxEggs = 20
             this.gameObjects = []
-            this.score = 0
-            this.lostHatchlings = 0
             this.mouse = {
                 x: this.width * 0.5,
                 y: this.height * 0.5,
